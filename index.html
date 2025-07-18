@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Critical Analysis of Agile Methodologies</title>
+    <!-- Chosen Palette: "Elegant Noir" - A minimalist, high-contrast palette using a deep charcoal background, off-white text, and a striking gold accent for a sophisticated, focused, and unique feel. -->
+    <!-- Application Structure Plan: A complete redesign into a "scrollytelling" single-page application. The layout is a two-panel stationary design. The left panel contains fixed navigation headers for each section. The right panel is a scrollable container where content sections fade in and out as the user scrolls. This creates a highly focused, cinematic user experience, guiding the user through the argument one piece at a time. All previous content and interactive elements are preserved within this new structure. -->
+    <!-- Visualization & Content Choices: 1. Scrollytelling (New UI Paradigm - All content -> Goal: Guide/Focus/Engage -> Viz: Stationary layout with scrolling content panels -> Interaction: User scroll triggers fade/transform animations via Intersection Observer -> Justification: Creates an elegant, unique, and immersive reading experience that is a departure from standard web pages). 2. All previous interactive elements (Charts, Gemini features, Toggles) are retained but restyled to fit the new "Elegant Noir" theme, ensuring functional consistency within a dramatically different aesthetic. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+        
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #d4af37; /* Gold */
+            --card-bg-color: rgba(30, 30, 30, 0.7);
+            --border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        html[dir="rtl"] body {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+        html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6 {
+             font-family: 'Vazirmatn', sans-serif;
+             font-weight: 700;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            height: 100vh;
+        }
+
+        .left-panel {
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .right-panel {
+            padding: 4rem 2rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .nav-link {
+            transition: color 0.3s ease, opacity 0.3s ease;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+        .nav-link.active {
+            color: var(--accent-color);
+            opacity: 1;
+        }
+
+        .content-section {
+            min-height: 100vh;
+            padding: 4rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative; width: 100%; max-width: 450px; margin: auto; height: 300px;
+        }
+
+        .loader {
+            width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: var(--accent-color); border-radius: 50%;
+            animation: spin 1s linear infinite; display: inline-block; margin-left: 8px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #konami-code {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; font-weight: 900; color: var(--accent-color);
+            opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 1000;
+            text-shadow: 0 0 15px var(--accent-color);
+        }
+
+        /* Custom Scrollbar for elegance */
+        .right-panel::-webkit-scrollbar { width: 6px; }
+        .right-panel::-webkit-scrollbar-track { background: transparent; }
+        .right-panel::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 10px; border: 3px solid transparent; }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .left-panel { display: none; }
+            .right-panel { padding: 2rem 1rem; }
+            .content-section { padding: 2rem 0; min-height: 0; margin-bottom: 4rem;}
+        }
+
+    </style>
+</head>
+<body>
+    <div id="konami-code">AGILITY!</div>
+
+    <div class="main-grid">
+        <!-- Left Panel: Navigation -->
+        <div class="left-panel">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 flex items-baseline">
+                    <span data-translate-key="mainTitleShort">Critique of Agile</span>
+                    <span id="title-easter-egg" class="text-5xl cursor-pointer ml-1" style="color: var(--accent-color);">.</span>
+                </h1>
+                <p class="text-lg opacity-70" data-translate-key="mainSubtitle">An Interactive Analysis</p>
+                <nav id="main-nav" class="mt-16 space-y-6">
+                    <a href="#intro" class="nav-link block text-2xl font-bold" data-translate-key="navIntro">Introduction</a>
+                    <a href="#timeline" class="nav-link block text-2xl font-bold" data-translate-key="navTimeline">History</a>
+                    <a href="#contradictions" class="nav-link block text-2xl font-bold" data-translate-key="navContradictions">Contradictions</a>
+                    <a href="#stats" class="nav-link block text-2xl font-bold" data-translate-key="navStats">Statistics</a>
+                    <a href="#buzzword-buster" class="nav-link block text-2xl font-bold" data-translate-key="navBuzzword">Buzzword Buster</a>
+                    <a href="#manifesto" class="nav-link block text-2xl font-bold" data-translate-key="navManifesto">The Manifesto</a>
+                    <a href="#dissent" class="nav-link block text-2xl font-bold" data-translate-key="navDissent">Voices</a>
+                    <a href="#conclusion" class="nav-link block text-2xl font-bold" data-translate-key="navConclusion">Conclusion</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 text-sm font-medium">
+                    <span>EN</span>
+                    <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="language-toggle" class="sr-only peer"><div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-color)]"></div></label>
+                    <span>FA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Content -->
+        <div class="right-panel" id="content-panel">
+            <section id="intro" class="content-section">
+                <h2 data-translate-key="introTitle" class="text-3xl font-bold mb-6" style="color: var(--accent-color);">Introduction: Beyond the Hype</h2>
+                <p data-translate-key="introText" class="text-lg leading-relaxed opacity-90">Agile methodologies, born from a desire to overcome the rigidities of traditional models like Waterfall, are now dominant in the software development industry. They are often presented as a universal solution for project management, promising flexibility, customer satisfaction, and rapid delivery. However, this widespread adoption often glosses over significant conceptual contradictions, statistical ambiguities, and practical challenges. This analysis moves beyond the promotional rhetoric to provide a logical and evidence-based critique of Agile, examining its core principles, real-world performance, and the often-unspoken reasons why it can fail. The goal is not to dismiss Agile entirely, but to foster a more nuanced and critical understanding of its limitations.</p>
+            </section>
+            
+            <section id="timeline" class="content-section">
+                 <h2 data-translate-key="timelineTitle" class="text-3xl font-bold mb-8" style="color: var(--accent-color);">A Brief History of Methodologies</h2>
+                 <div id="timeline-container" class="border-l-2 pl-6" style="border-color: var(--border-color);"></div>
+            </section>
+
+            <section id="contradictions" class="content-section">
+                <h2 data-translate-key="contradictionTitle" class="text-3xl font-bold mb-8" style="color: var(--accent-color);">The Core Contradiction: Universal Solution vs. Niche Tool</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="card"><h3 data-translate-key="contradictionSub1" class="text-xl font-bold mb-3">The "Scalability" Paradox</h3><p data-translate-key="contradictionText1" class="opacity-90 critique-text">A primary criticism of older methods was their unsuitability for large, complex projects. Agile was proposed as the solution. Yet, a fundamental contradiction arises: Agile's core principles (e.g., small, self-organizing, co-located teams) are inherently difficult to scale. To address this, frameworks like SAFe (Scaled Agile Framework) were created, but critics argue these frameworks re-introduce the same bureaucratic overhead and rigidity Agile was meant to eliminate. They become "Waterfall in disguise," creating a paradox where scaling Agile often means abandoning its core spirit.</p></div>
+                    <div class="card"><h3 data-translate-key="contradictionSub2" class="text-xl font-bold mb-3">Predictability vs. Adaptability</h3><p data-translate-key="contradictionText2" class="opacity-90 critique-text">Agile champions adaptability, famously "welcoming changing requirements." While beneficial for navigating uncertainty, this creates a major conflict with a critical business need: predictability. Businesses require reliable budgets, timelines, and scope definitions for planning and investment. Agile's iterative nature makes long-term forecasting notoriously difficult, leading to financial uncertainty and stakeholder frustration. It claims to solve management problems while creating a new, significant one for business strategists.</p></div>
+                </div>
+            </section>
+
+            <section id="stats" class="content-section">
+                <h2 data-translate-key="statsTitle" class="text-3xl font-bold mb-8" style="color: var(--accent-color);">Statistical Reality Check</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="card"><h3 data-translate-key="chart1Title" class="text-xl font-bold text-center mb-4">Project Outcomes: Agile vs. Traditional</h3><div class="chart-container"><canvas id="successRateChart"></canvas></div></div>
+                    <div class="card"><h3 data-translate-key="chart2Title" class="text-xl font-bold text-center mb-4">Top Reasons for Agile Project Failure</h3><div class="chart-container"><canvas id="failureReasonsChart"></canvas></div></div>
+                </div>
+            </section>
+            
+            <section id="buzzword-buster" class="content-section">
+                <h2 data-translate-key="buzzwordTitle" class="text-3xl font-bold mb-4" style="color: var(--accent-color);">Agile Buzzword Buster</h2>
+                <p data-translate-key="buzzwordIntro" class="opacity-90 mb-6">Enter a common Agile term (e.g., velocity, synergy, pivot) to get a critical, AI-powered definition that cuts through the hype.</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="buzzword-input" data-translate-key="buzzwordPlaceholder" placeholder="e.g., velocity" class="flex-grow p-3 rounded-md bg-black/20 border border-white/10 focus:ring-2 focus:outline-none" style="--tw-ring-color: var(--accent-color);">
+                    <button id="buzzword-button" class="text-black font-bold py-3 px-5 rounded-md hover:opacity-90 transition-opacity duration-200 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span data-translate-key="buzzwordBtn">Bust the Buzzword</span>
+                    </button>
+                </div>
+                <div id="buzzword-output" class="mt-6 card hidden"></div>
+            </section>
+
+            <section id="manifesto" class="content-section">
+                <h2 data-translate-key="manifestoTitle" class="text-3xl font-bold mb-8" style="color: var(--accent-color);">Deconstructing the Manifesto: Idealism vs. Reality</h2>
+                <div id="accordion-container" class="space-y-3"></div>
+            </section>
+            
+            <section id="dissent" class="content-section">
+                <h2 data-translate-key="dissentTitle" class="text-3xl font-bold mb-8" style="color: var(--accent-color);">Voices of Dissent</h2>
+                 <div class="space-y-6">
+                    <blockquote class="card border-l-4" style="border-color: var(--accent-color);"><p data-translate-key="quote1Text" class="text-lg italic opacity-90">"The 'A' in Agile has become a brand, a marketing term. The original ideas were about agility, but what is sold now is a rigid, prescriptive process. It’s a cancer that hollows out the meaning of the original values."</p><cite data-translate-key="quote1Cite" class="block text-right mt-4 not-italic font-semibold opacity-70">- David Heinemeier Hansson (Creator of Ruby on Rails)</cite></blockquote>
+                    <blockquote class="card border-l-4" style="border-color: var(--accent-color);"><p data-translate-key="quote2Text" class="text-lg italic opacity-90">"Agile did not propose to be a method for 'management'. It was a set of values proposed by developers, for developers. When managers and corporations co-opted it, they created certifications and processes that are often antithetical to true agility."</p><cite data-translate-key="quote2Cite" class="block text-right mt-4 not-italic font-semibold opacity-70">- Robert C. Martin (Signatory of the Agile Manifesto)</cite></blockquote>
+                </div>
+            </section>
+
+            <section id="conclusion" class="content-section">
+                <h2 data-translate-key="conclusionTitle" class="text-3xl font-bold mb-6" style="color: var(--accent-color);">Conclusion: Agile as a Toolkit, Not a Dogma</h2>
+                <p data-translate-key="conclusionText" id="conclusion-static-text" class="text-lg leading-relaxed opacity-90">The critique of Agile is not a call to return to the inflexible monoliths of the past. Rather, it is an argument for intellectual honesty. Agile offers a valuable set of tools and mindsets, particularly its emphasis on iterative development, feedback loops, and empowering developers. However, it is not a religion, and its manifesto is not scripture. The logical contradictions in its philosophy, its documented failures in practice, and the impracticality of its most idealistic principles demonstrate that it is not a one-size-fits-all solution. A mature approach involves selectively applying Agile principles where they fit, combining them with the discipline of traditional planning where necessary, and customizing a process that serves the project's reality—not the other way around. True agility lies in this pragmatic flexibility, not in the dogmatic adherence to a brand.</p>
+                <div id="ai-summary-container" class="mt-8">
+                     <button id="summarize-button" class="text-black font-bold py-2 px-4 rounded-md hover:opacity-90 transition-opacity duration-200 flex items-center justify-center" style="background-color: var(--accent-color);">
+                        <span data-translate-key="summarizeBtn">✨ Generate AI Summary of Critiques</span>
+                     </button>
+                     <div id="summary-output" class="mt-6 card hidden"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                mainTitleShort: "Critique of Agile", mainSubtitle: "An Interactive Analysis",
+                navIntro: "Introduction", navTimeline: "History", navContradictions: "Contradictions", navStats: "Statistics", navBuzzword: "Buzzword Buster", navManifesto: "The Manifesto", navDissent: "Voices", navConclusion: "Conclusion",
+                introTitle: "Introduction: Beyond the Hype",
+                introText: "Agile methodologies, born from a desire to overcome the rigidities of traditional models like Waterfall, are now dominant in the software development industry. They are often presented as a universal solution for project management, promising flexibility, customer satisfaction, and rapid delivery. However, this widespread adoption often glosses over significant conceptual contradictions, statistical ambiguities, and practical challenges. This analysis moves beyond the promotional rhetoric to provide a logical and evidence-based critique of Agile, examining its core principles, real-world performance, and the often-unspoken reasons why it can fail. The goal is not to dismiss Agile entirely, but to foster a more nuanced and critical understanding of its limitations.",
+                timelineTitle: "A Brief History of Methodologies",
+                contradictionTitle: "The Core Contradiction: Universal Solution vs. Niche Tool",
+                contradictionSub1: "The 'Scalability' Paradox",
+                contradictionText1: "A primary criticism of older methods was their unsuitability for large, complex projects. Agile was proposed as the solution. Yet, a fundamental contradiction arises: Agile's core principles (e.g., small, self-organizing, co-located teams) are inherently difficult to scale. To address this, frameworks like SAFe (Scaled Agile Framework) were created, but critics argue these frameworks re-introduce the same bureaucratic overhead and rigidity Agile was meant to eliminate. They become 'Waterfall in disguise,' creating a paradox where scaling Agile often means abandoning its core spirit.",
+                contradictionSub2: "Predictability vs. Adaptability",
+                contradictionText2: "Agile champions adaptability, famously 'welcoming changing requirements.' While beneficial for navigating uncertainty, this creates a major conflict with a critical business need: predictability. Businesses require reliable budgets, timelines, and scope definitions for planning and investment. Agile's iterative nature makes long-term forecasting notoriously difficult, leading to financial uncertainty and stakeholder frustration. It claims to solve management problems while creating a new, significant one for business strategists.",
+                statsTitle: "Statistical Reality Check",
+                chart1Title: "Project Outcomes: Agile vs. Traditional",
+                chart2Title: "Top Reasons for Agile Project Failure",
+                buzzwordTitle: "Agile Buzzword Buster",
+                buzzwordIntro: "Enter a common Agile term (e.g., velocity, synergy, pivot) to get a critical, AI-powered definition that cuts through the hype.",
+                buzzwordPlaceholder: "e.g., velocity",
+                buzzwordBtn: "Bust the Buzzword",
+                manifestoTitle: "Deconstructing the Manifesto: Idealism vs. Reality",
+                dissentTitle: "Voices of Dissent",
+                quote1Text: "The 'A' in Agile has become a brand, a marketing term. The original ideas were about agility, but what is sold now is a rigid, prescriptive process. It’s a cancer that hollows out the meaning of the original values.",
+                quote1Cite: "- David Heinemeier Hansson (Creator of Ruby on Rails)",
+                quote2Text: "Agile did not propose to be a method for 'management'. It was a set of values proposed by developers, for developers. When managers and corporations co-opted it, they created certifications and processes that are often antithetical to true agility.",
+                quote2Cite: "- Robert C. Martin (Signatory of the Agile Manifesto)",
+                conclusionTitle: "Conclusion: Agile as a Toolkit, Not a Dogma",
+                conclusionText: "The critique of Agile is not a call to return to the inflexible monoliths of the past. Rather, it is an argument for intellectual honesty. Agile offers a valuable set of tools and mindsets, particularly its emphasis on iterative development, feedback loops, and empowering developers. However, it is not a religion, and its manifesto is not scripture. The logical contradictions in its philosophy, its documented failures in practice, and the impracticality of its most idealistic principles demonstrate that it is not a one-size-fits-all solution. A mature approach involves selectively applying Agile principles where they fit, combining them with the discipline of traditional planning where necessary, and customizing a process that serves the project's reality—not the other way around. True agility lies in this pragmatic flexibility, not in the dogmatic adherence to a brand.",
+                chartLabels: {
+                    success: 'Successful', challenged: 'Challenged', failed: 'Failed', agile: 'Agile', waterfall: 'Waterfall',
+                    failureReasons: ['Company culture at odds with Agile values', 'Lack of experience with Agile methods', 'Lack of management support', 'Unwillingness to change', 'Inadequate tools and training'],
+                },
+                manifestoPrinciples: [
+                    { p: "Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.", c: "Critique: 'Continuous delivery' can lead to 'continuous disruption' for users if not managed properly. The focus on speed can also deprioritize non-functional requirements like security and scalability, creating technical debt. 'Valuable' is subjective and can change, leading to rework." },
+                    { p: "Welcome changing requirements, even late in development. Agile processes harness change for the customer's competitive advantage.", c: "Critique: This is one of the most abused principles. Uncontrolled, it leads to endless scope creep, developer burnout, and budget overruns. It requires an extremely strong product owner who can differentiate between a valuable change and a distraction, a role that is often not empowered enough." },
+                    { p: "Deliver working software frequently, from a couple of weeks to a couple of months, with a preference to the shorter timescale.", c: "Critique: The pressure for short release cycles can lead to rushed, poorly tested code. It can also create an illusion of progress where many small features are delivered, but the core, complex problems remain unsolved. The overhead of frequent releases (testing, deployment) is often underestimated." },
+                    { p: "Business people and developers must work together daily throughout the project.", c: "Critique: This is highly idealistic. In most organizations, business stakeholders have other responsibilities and cannot dedicate themselves to a single project daily. This often becomes a bottleneck, with developers waiting for feedback or decisions." },
+                    { p: "Build projects around motivated individuals. Give them the environment and support they need, and trust them to get the job done.", c: "Critique: While a noble goal, it assumes a constant supply of 'motivated individuals'. It offers little guidance on how to handle underperformers or team conflicts. The 'trust' element can be exploited, and a lack of oversight can lead to projects diverging from business goals." },
+                    { p: "The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.", c: "Critique: This principle has aged poorly in the era of global remote work. While valuable, it dangerously de-emphasizes the need for clear, persistent, written documentation. A reliance on conversations leads to knowledge silos and makes onboarding new team members difficult." },
+                    { p: "Working software is the primary measure of progress.", c: "Critique: This is a dangerously simplistic metric. It ignores other critical measures of progress, such as architectural integrity, code quality, test coverage, and documentation. A project can have 'working software' that is an unmaintainable nightmare." },
+                    { p: "Agile processes promote sustainable development. The sponsors, developers, and users should be able to maintain a constant pace indefinitely.", c: "Critique: The concept of a 'constant pace' is often a myth. Sprints can create a cycle of intense work followed by burnout. The pressure to deliver in each short cycle can discourage deep thinking and long-term architectural planning, leading to an unsustainable accumulation of technical debt." },
+                    { p: "Continuous attention to technical excellence and good design enhances agility.", c: "Critique: In practice, the pressure of short deadlines often forces teams to compromise on technical excellence. This principle is frequently the first to be sacrificed in the name of 'getting a feature out the door,' directly contradicting the long-term goal of agility." },
+                    { p: "Simplicity--the art of maximizing the amount of work not done--is essential.", c: "Critique: This is often misinterpreted as 'do the easiest thing now.' While intended to prevent over-engineering, it can lead to short-sighted solutions that are not scalable or robust, creating significant rework later. Determining what work is truly 'not needed' requires a level of foresight that Agile's short-term focus can undermine." },
+                    { p: "The best architectures, requirements, and designs emerge from self-organizing teams.", c: "Critique: This is a high-risk gamble. While self-organizing teams can be innovative, they can also produce chaotic, inconsistent architectures without senior technical leadership and a clear architectural vision. It assumes a uniform level of high skill and experience across the team, which is rarely the case." },
+                    { p: "At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly.", c: "Critique: The retrospective is often the first ceremony to be skipped under deadline pressure. When they do happen, they can devolve into 'blame sessions' or superficial discussions without leading to meaningful change, becoming a ritual rather than a tool for improvement." }
+                ],
+                timelineData: [
+                    { year: "1970", title: "Waterfall Model Codified", desc: "Winston W. Royce's paper formally describes the sequential 'Waterfall' model, becoming a standard for large-scale projects." },
+                    { year: "1995", title: "Scrum is Formalized", desc: "Ken Schwaber and Jeff Sutherland formally present the Scrum framework, emphasizing iterative development and sprints." },
+                    { year: "2001", title: "The Agile Manifesto", desc: "17 software developers meet in Snowbird, Utah, to write the 'Manifesto for Agile Software Development', establishing its core values and principles." },
+                    { year: "2004", title: "Kanban for Software", desc: "David J. Anderson adapts the Kanban manufacturing system for software development, focusing on continuous flow and limiting work-in-progress." },
+                    { year: "2011", title: "SAFe is Launched", desc: "The Scaled Agile Framework (SAFe) is introduced by Dean Leffingwell to apply Agile principles to large, enterprise-level projects." }
+                ],
+                rebuttalBtn: "✨ Generate Counter-Argument",
+                rebuttalTitle: "Pro-Agile Rebuttal (AI-Generated)",
+                summarizeBtn: "✨ Generate AI Summary of Critiques",
+                loading: "Generating...",
+                error: "An error occurred. Please try again."
+            },
+            fa: {
+                mainTitleShort: "نقد چابک", mainSubtitle: "یک تحلیل تعاملی",
+                navIntro: "مقدمه", navTimeline: "تاریخچه", navContradictions: "تناقضات", navStats: "آمار", navBuzzword: "واژه‌نامه", navManifesto: "مانیفست", navDissent: "صداها", navConclusion: "نتیجه‌گیری",
+                introTitle: "مقدمه: فراتر از هیاهو",
+                introText: "متدولوژی‌های چابک (Agile) که از دل تمایل به غلبه بر سختی‌های مدل‌های سنتی مانند آبشاری (Waterfall) متولد شدند، امروزه بر صنعت توسعه نرم‌افزار تسلط دارند. این متدولوژی‌ها اغلب به‌عنوان یک راه‌حل جهانی برای مدیریت پروژه ارائه می‌شوند و وعده انعطاف‌پذیری، رضایت مشتری و تحویل سریع را می‌دهند. با این حال، این پذیرش گسترده اغلب تناقضات مفهومی، ابهامات آماری و چالش‌های عملی قابل توجهی را نادیده می‌گیرد. این تحلیل، فراتر از لفاظی‌های تبلیغاتی، به ارائه یک نقد منطقی و مبتنی بر شواهد از اجایل می‌پردازد و اصول اصلی، عملکرد در دنیای واقعی و دلایل ناگفته شکست آن را بررسی می‌کند. هدف، رد کامل اجایل نیست، بلکه پرورش درکی دقیق‌تر و انتقادی از محدودیت‌های آن است.",
+                timelineTitle: "تاریخچه مختصر متدولوژی‌ها",
+                contradictionTitle: "تناقض اصلی: راه‌حل جهانی در مقابل ابزار تخصصی",
+                contradictionSub1: "پارادوکس 'مقیاس‌پذیری'",
+                contradictionText1: "یکی از انتقادات اصلی به روش‌های قدیمی، عدم تناسب آن‌ها برای پروژه‌های بزرگ و پیچیده بود. اجایل به‌عنوان راه‌حل پیشنهاد شد. با این حال، یک تناقض اساسی به وجود می‌آید: اصول اصلی اجایل (مانند تیم‌های کوچک، خودسازمان‌ده و مستقر در یک مکان) ذاتاً برای مقیاس‌پذیری دشوار هستند. برای حل این مشکل، چارچوب‌هایی مانند SAFe (چارچوب چابک مقیاس‌پذیر) ایجاد شدند، اما منتقدان معتقدند این چارچوب‌ها همان سربار بوروکراتیک و سختی را که اجایل قرار بود حذف کند، دوباره معرفی می‌کنند. آن‌ها به 'آبشاری در لباس مبدل' تبدیل می‌شوند و پارادوکسی ایجاد می‌کنند که در آن مقیاس‌پذیر کردن اجایل اغلب به معنای رها کردن روح اصلی آن است.",
+                contradictionSub2: "پیش‌بینی‌پذیری در مقابل سازگاری",
+                contradictionText2: "اجایل از سازگاری دفاع می‌کند و به شکلی معروف 'از تغییر نیازمندی‌ها استقبال می‌کند'. اگرچه این ویژگی برای مدیریت عدم قطعیت مفید است، اما یک تضاد بزرگ با یک نیاز حیاتی کسب‌وکار ایجاد می‌کند: پیش‌بینی‌پذیری. کسب‌وکارها برای برنامه‌ریزی و سرمایه‌گذاری به بودجه‌ها، زمان‌بندی‌ها و تعریف محدوده قابل اعتماد نیاز دارند. ماهیت تکرارشونده اجایل، پیش‌بینی بلندمدت را بسیار دشوار می‌کند و منجر به عدم قطعیت مالی و ناامیدی ذی‌نفعان می‌شود. این متدولوژی ادعا می‌کند که مشکلات مدیریتی را حل می‌کند، در حالی که یک مشکل جدید و مهم برای استراتژیست‌های کسب‌وکار ایجاد می‌کند.",
+                statsTitle: "بررسی آماری واقعیت",
+                chart1Title: "نتایج پروژه‌ها: اجایل در مقابل سنتی",
+                chart2Title: "دلایل اصلی شکست پروژه‌های اجایل",
+                buzzwordTitle: "واژه‌نامه انتقادی اجایل",
+                buzzwordIntro: "یک اصطلاح رایج اجایل (مانند velocity, synergy, pivot) را وارد کنید تا یک تعریف انتقادی و مبتنی بر هوش مصنوعی دریافت کنید که فراتر از تبلیغات است.",
+                buzzwordPlaceholder: "مثلا: velocity",
+                buzzwordBtn: "معنی واقعی کلمه",
+                manifestoTitle: "واشکافی مانیفست: ایده‌آل‌گرایی در مقابل واقعیت",
+                dissentTitle: "صداهای مخالف",
+                quote1Text: "حرف 'A' در کلمه Agile به یک برند، یک اصطلاح بازاریابی تبدیل شده است. ایده‌های اصلی در مورد چابکی بود، اما آنچه اکنون فروخته می‌شود یک فرآیند سفت و سخت و تجویزی است. این یک سرطان است که معنای ارزش‌های اصلی را از درون تهی می‌کند.",
+                quote1Cite: "- دیوید هاینمیر هنسون (خالق روبی آن ریلز)",
+                quote2Text: "اجایل برای 'مدیریت' پیشنهاد نشده بود. مجموعه‌ای از ارزش‌ها بود که توسط توسعه‌دهندگان، برای توسعه‌دهندگان پیشنهاد شد. وقتی مدیران و شرکت‌ها آن را به نفع خود مصادره کردند، گواهی‌نامه‌ها و فرآیندهایی را ایجاد کردند که اغلب با چابکی واقعی در تضاد است.",
+                quote2Cite: "- رابرت سی. مارتین (از امضاکنندگان مانیفست اجایل)",
+                conclusionTitle: "نتیجه‌گیری: اجایل به عنوان یک جعبه ابزار، نه یک دگم",
+                conclusionText: "نقد اجایل به معنای فراخوانی برای بازگشت به غول‌های انعطاف‌ناپذیر گذشته نیست. بلکه استدلالی برای صداقت فکری است. اجایل مجموعه ابزارها و ذهنیت‌های ارزشمندی را ارائه می‌دهد، به‌ویژه تأکید آن بر توسعه تکرارشونده، حلقه‌های بازخورد و توانمندسازی توسعه‌دهندگان. با این حال، این یک دین نیست و مانیفست آن کتاب مقدس نیست. تناقضات منطقی در فلسفه آن، شکست‌های مستند آن در عمل، و غیرعملی بودن ایده‌آل‌گرایانه‌ترین اصول آن نشان می‌دهد که این یک راه‌حل برای همه مشکلات نیست. یک رویکرد بالغ شامل استفاده انتخابی از اصول اجایل در جایی که مناسب هستند، ترکیب آن‌ها با انضباط برنامه‌ریزی سنتی در صورت لزوم، و سفارشی‌سازی فرآیندی است که به واقعیت پروژه خدمت می‌کند - نه برعکس. چابکی واقعی در این انعطاف‌پذیری عمل‌گرایانه نهفته است، نه در پایبندی متعصبانه به یک برند.",
+                chartLabels: {
+                    success: 'موفق', challenged: 'چالش‌برانگیز', failed: 'شکست‌خورده', agile: 'اجایل', waterfall: 'آبشاری',
+                    failureReasons: ['فرهنگ شرکت در تضاد با ارزش‌های اجایل', 'فقدان تجربه در روش‌های اجایل', 'عدم حمایت مدیریت', 'عدم تمایل به تغییر', 'ابزارها و آموزش ناکافی'],
+                },
+                manifestoPrinciples: [
+                    { p: "بالاترین اولویت ما، رضایت مشتری از طریق تحویل زودهنگام و مداوم نرم‌افزار ارزشمند است.", c: "نقد: 'تحویل مداوم' اگر به درستی مدیریت نشود، می‌تواند به 'اختلال مداوم' برای کاربران منجر شود. تمرکز بر سرعت همچنین می‌تواند نیازمندی‌های غیرعملکردی مانند امنیت و مقیاس‌پذیری را در اولویت پایین‌تری قرار دهد و بدهی فنی ایجاد کند. 'ارزشمند' بودن ذهنی است و می‌تواند تغییر کند، که منجر به دوباره‌کاری می‌شود." },
+                    { p: "از تغییر نیازمندی‌ها، حتی در مراحل پایانی توسعه، استقبال کنید. فرآیندهای چابک، تغییر را برای مزیت رقابتی مشتری مهار می‌کنند.", c: "نقد: این یکی از مورد سوءاستفاده‌ترین اصول است. بدون کنترل، منجر به خزش بی‌پایان محدوده، فرسودگی توسعه‌دهندگان و فراتر رفتن از بودجه می‌شود. این اصل به یک مالک محصول بسیار قوی نیاز دارد که بتواند بین یک تغییر ارزشمند و یک عامل حواس‌پرتی تمایز قائل شود، نقشی که اغلب به اندازه کافی قدرتمند نیست." },
+                    { p: "نرم‌افزار کارا را به طور مکرر، از چند هفته تا چند ماه، تحویل دهید و اولویت با بازه‌های زمانی کوتاه‌تر است.", c: "نقد: فشار برای چرخه‌های انتشار کوتاه می‌تواند منجر به کدنویسی عجولانه و با تست ضعیف شود. همچنین می‌تواند توهم پیشرفت ایجاد کند، جایی که ویژگی‌های کوچک زیادی تحویل داده می‌شوند، اما مشکلات اصلی و پیچیده حل نشده باقی می‌مانند. سربار انتشارهای مکرر (تست، استقرار) اغلب دست‌کم گرفته می‌شود." },
+                    { p: "افراد کسب‌وکار و توسعه‌دهندگان باید روزانه در طول پروژه با یکدیگر کار کنند.", c: "نقد: این بسیار ایده‌آل‌گرایانه است. در اکثر سازمان‌ها، ذی‌نفعان کسب‌وکار مسئولیت‌های دیگری دارند و نمی‌توانند روزانه خود را وقف یک پروژه واحد کنند. این اغلب به یک گلوگاه تبدیل می‌شود و توسعه‌دهندگان منتظر بازخورد یا تصمیم‌گیری می‌مانند." },
+                    { p: "پروژه‌ها را حول افراد باانگیزه بسازید. محیط و پشتیبانی مورد نیازشان را به آنها بدهید و به آنها برای انجام کار اعتماد کنید.", c: "نقد: اگرچه یک هدف شریف است، اما فرض می‌کند که عرضه دائمی 'افراد باانگیزه' وجود دارد. این اصل راهنمایی کمی در مورد نحوه برخورد با افراد کم‌کار یا تعارضات تیمی ارائه می‌دهد. عنصر 'اعتماد' می‌تواند مورد سوءاستفاده قرار گیرد و عدم نظارت می‌تواند منجر به انحراف پروژه‌ها از اهداف کسب‌وکار شود." },
+                    { p: "کارآمدترین و مؤثرترین روش انتقال اطلاعات به و در داخل یک تیم توسعه، گفتگوی رو در رو است.", c: "نقد: این اصل در عصر کار از راه دور جهانی، به خوبی کهنه نشده است. اگرچه ارزشمند است، اما به طور خطرناکی بر نیاز به مستندات مکتوب، واضح و پایدار تأکید نمی‌کند. اتکا به گفتگوها منجر به ایجاد سیلوهای دانش می‌شود و ورود اعضای جدید تیم را دشوار می‌کند." },
+                    { p: "نرم‌افزار کارا، معیار اصلی پیشرفت است.", c: "نقد: این یک معیار به طرز خطرناکی ساده‌انگارانه است. این معیار، سایر معیارهای حیاتی پیشرفت مانند یکپارچگی معماری، کیفیت کد، پوشش تست و مستندات را نادیده می‌گیرد. یک پروژه می‌تواند 'نرم‌افزار کارا' داشته باشد که یک کابوس غیرقابل نگهداری است." },
+                    { p: "فرآیندهای چابک، توسعه پایدار را ترویج می‌کنند. حامیان، توسعه‌دهندگان و کاربران باید بتوانند یک سرعت ثابت را به طور نامحدود حفظ کنند.", c: "نقد: مفهوم 'سرعت ثابت' اغلب یک افسانه است. اسپرینت‌ها می‌توانند چرخه‌ای از کار فشرده و سپس فرسودگی ایجاد کنند. فشار برای تحویل در هر چرخه کوتاه می‌تواند تفکر عمیق و برنامه‌ریزی معماری بلندمدت را تضعیف کند و منجر به انباشت ناپایدار بدهی فنی شود." },
+                    { p: "توجه مداوم به برتری فنی و طراحی خوب، چابکی را افزایش می‌دهد.", c: "نقد: در عمل، فشار مهلت‌های کوتاه اغلب تیم‌ها را مجبور به مصالحه در مورد برتری فنی می‌کند. این اصل غالباً اولین چیزی است که به نام 'عرضه یک ویژگی' قربانی می‌شود و مستقیماً با هدف بلندمدت چابکی در تضاد است." },
+                    { p: "سادگی - هنر به حداکثر رساندن مقدار کاری که انجام نمی‌شود - ضروری است.", c: "نقد: این اغلب به عنوان 'انجام ساده‌ترین کار در حال حاضر' تعبیر می‌شود. در حالی که هدف آن جلوگیری از مهندسی بیش از حد است، می‌تواند منجر به راه‌حل‌های کوتاه‌بینانه‌ای شود که مقیاس‌پذیر یا قوی نیستند و بعداً دوباره‌کاری قابل توجهی ایجاد می‌کنند. تعیین اینکه چه کاری واقعاً 'لازم نیست' به سطحی از آینده‌نگری نیاز دارد که تمرکز کوتاه‌مدت اجایل می‌تواند آن را تضعیف کند." },
+                    { p: "بهترین معماری‌ها، نیازمندی‌ها و طراحی‌ها از تیم‌های خودسازمان‌ده پدید می‌آیند.", c: "نقد: این یک قمار پرخطر است. در حالی که تیم‌های خودسازمان‌ده می‌توانند نوآور باشند، بدون رهبری فنی ارشد و چشم‌انداز معماری واضح، می‌توانند معماری‌های آشفته و ناهماهنگی نیز تولید کنند. این اصل فرض می‌کند که سطح یکنواختی از مهارت و تجربه بالا در سراسر تیم وجود دارد که به ندرت چنین است." },
+                    { p: "در فواصل زمانی منظم، تیم در مورد چگونگی مؤثرتر شدن تأمل می‌کند، سپس رفتار خود را تنظیم و تطبیق می‌دهد.", c: "نقد: جلسه بازنگری (retrospective) اغلب اولین مراسمی است که تحت فشار مهلت زمانی نادیده گرفته می‌شود. زمانی که برگزار می‌شوند، می‌توانند به 'جلسات سرزنش' یا بحث‌های سطحی بدون منجر شدن به تغییر معنادار تبدیل شوند و به جای ابزاری برای بهبود، به یک تشریفات تبدیل شوند." }
+                ],
+                 timelineData: [
+                    { year: "۱۹۷۰", title: "تدوین مدل آبشاری", desc: "مقاله وینستون دبلیو. رویس به طور رسمی مدل متوالی 'آبشاری' را توصیف می‌کند که به استانداردی برای پروژه‌های بزرگ تبدیل شد." },
+                    { year: "۱۹۹۵", title: "رسمی شدن اسکرام", desc: "کن شوابر و جف ساترلند به طور رسمی چارچوب اسکرام را ارائه می‌دهند که بر توسعه تکراری و اسپرینت‌ها تأکید دارد." },
+                    { year: "۲۰۰۱", title: "مانیفست چابک", desc: "۱۷ توسعه‌دهنده نرم‌افزار در اسنوبیرد، یوتا، گرد هم می‌آیند تا 'مانیفست توسعه نرم‌افزار چابک' را بنویسند و ارزش‌ها و اصول اصلی آن را پایه‌گذاری کنند." },
+                    { year: "۲۰۰۴", title: "کانبان برای نرم‌افزار", desc: "دیوید جی. اندرسون سیستم تولیدی کانبان را برای توسعه نرم‌افزار تطبیق می‌دهد و بر جریان پیوسته و محدود کردن کار در حال انجام تمرکز می‌کند." },
+                    { year: "۲۰۱۱", title: "راه‌اندازی SAFe", desc: "چارچوب چابک مقیاس‌پذیر (SAFe) توسط دین لفینگول برای به کارگیری اصول چابک در پروژه‌های بزرگ و سطح سازمانی معرفی شد." }
+                ],
+                rebuttalBtn: "✨ ایجاد استدلال متقابل",
+                rebuttalTitle: "پاسخ طرفدار اجایل (ایجاد شده توسط هوش مصنوعی)",
+                summarizeBtn: "✨ ایجاد خلاصه انتقادات با هوش مصنوعی",
+                loading: "در حال ایجاد...",
+                error: "خطایی روی داد. لطفا دوباره تلاش کنید."
+            }
+        };
+
+        let currentLanguage = 'en';
+        let successRateChart = null;
+        let failureReasonsChart = null;
+        const konamiCodeSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        let titleClickCount = 0;
+
+        function translatePage() {
+            const langData = translations[currentLanguage];
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (langData[key]) {
+                    if (el.tagName === 'INPUT') el.placeholder = langData[key];
+                    else el.innerHTML = langData[key];
+                }
+            });
+            document.documentElement.lang = currentLanguage;
+            document.documentElement.dir = currentLanguage === 'fa' ? 'rtl' : 'ltr';
+            updateCharts();
+            createAccordion();
+            createTimeline();
+        }
+
+        async function callGemini(prompt) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                if (result.candidates?.[0]?.content?.parts?.[0]) return result.candidates[0].content.parts[0].text;
+                throw new Error("Invalid API response structure");
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return translations[currentLanguage].error;
+            }
+        }
+
+        function createAccordion() {
+            const container = document.getElementById('accordion-container');
+            container.innerHTML = '';
+            translations[currentLanguage].manifestoPrinciples.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <button class="accordion-button w-full text-left p-4 flex justify-between items-center font-semibold">
+                        <span class="flex-1 pr-4">${item.p}</span>
+                        <span class="icon text-3xl font-light transform-gpu transition-transform" style="color: var(--accent-color);">+</span>
+                    </button>
+                    <div class="accordion-content leading-relaxed opacity-90" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; padding: 0 1.5rem;">
+                        <p class="critique-text">${item.c}</p>
+                        <div class="mt-4">
+                            <button class="generate-rebuttal-btn text-black font-bold py-2 px-3 rounded-md hover:opacity-90 transition-opacity text-sm flex items-center" style="background-color: var(--accent-color);">
+                                <span data-translate-key="rebuttalBtn">${translations[currentLanguage].rebuttalBtn}</span>
+                            </button>
+                        </div>
+                        <div class="rebuttal-output mt-4"></div>
+                    </div>`;
+                container.appendChild(div);
+            });
+        }
+        
+        function createTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+            translations[currentLanguage].timelineData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item relative pb-8';
+                div.innerHTML = `
+                    <div class="absolute top-1 -left-[2.1rem] w-3 h-3 rounded-full" style="background-color: var(--accent-color);"></div>
+                    <time class="block mb-1 text-sm font-normal leading-none opacity-50">${item.year}</time>
+                    <h3 class="text-lg font-semibold">${item.title}</h3>
+                    <p class="my-1 text-base font-normal opacity-80">${item.desc}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateCharts() {
+            const chartLabels = translations[currentLanguage].chartLabels;
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+            const gridColor = 'rgba(255, 255, 255, 0.1)';
+
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: textColor, ...getChartFontOptions().plugins.legend.labels } }, tooltip: { ...getChartFontOptions().plugins.tooltip } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, ...getChartFontOptions().scales.y.ticks } },
+                    x: { grid: { display: false }, ticks: { color: textColor, ...getChartFontOptions().scales.x.ticks } }
+                }
+            };
+            
+            if (successRateChart) successRateChart.destroy();
+            successRateChart = new Chart(document.getElementById('successRateChart'), {
+                type: 'bar',
+                data: {
+                    labels: [chartLabels.success, chartLabels.challenged, chartLabels.failed],
+                    datasets: [
+                        { label: chartLabels.agile, data: [42, 49, 9], backgroundColor: 'rgba(212, 175, 55, 0.7)', borderWidth: 0 },
+                        { label: chartLabels.waterfall, data: [13, 56, 31], backgroundColor: 'rgba(107, 114, 128, 0.7)', borderWidth: 0 }
+                    ]
+                },
+                options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, ticks: { ...commonOptions.scales.y.ticks, callback: (v) => v + '%' } } } }
+            });
+
+            if (failureReasonsChart) failureReasonsChart.destroy();
+            failureReasonsChart = new Chart(document.getElementById('failureReasonsChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: chartLabels.failureReasons,
+                    datasets: [{
+                        data: [46, 42, 41, 30, 29],
+                        backgroundColor: ['#d4af37', '#b89a30', '#9c8529', '#807022', '#645b1b'],
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-color'),
+                        borderWidth: 4,
+                    }]
+                },
+                options: { ...commonOptions, scales: { x: { display: false }, y: { display: false } }, plugins: { ...commonOptions.plugins, legend: { ...commonOptions.plugins.legend, position: 'bottom' } } }
+            });
+        }
+        
+        function getChartFontOptions() {
+             const fontFamily = currentLanguage === 'fa' ? 'Vazirmatn' : 'Roboto';
+             return {
+                plugins: { legend: { labels: { font: { family: fontFamily } } }, tooltip: { titleFont: { family: fontFamily, weight: 'bold' }, bodyFont: { family: fontFamily } } },
+                scales: { x: { ticks: { font: { family: fontFamily } } }, y: { ticks: { font: { family: fontFamily } } } }
+            };
+        }
+
+        function setupEventListeners() {
+            document.getElementById('language-toggle').addEventListener('change', (e) => {
+                currentLanguage = e.target.checked ? 'fa' : 'en';
+                translatePage();
+            });
+
+            document.getElementById('accordion-container').addEventListener('click', (e) => {
+                const button = e.target.closest('.accordion-button');
+                if (button) {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('.icon');
+                    if (content.style.maxHeight !== '0px') {
+                        content.style.maxHeight = '0px';
+                        content.style.padding = '0 1.5rem';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.style.padding = '1rem 1.5rem 1.5rem';
+                        icon.style.transform = 'rotate(135deg)';
+                    }
+                }
+                const rebuttalButton = e.target.closest('.generate-rebuttal-btn');
+                if (rebuttalButton) handleRebuttalGeneration(rebuttalButton);
+            });
+            
+            const buzzwordButton = document.getElementById('buzzword-button');
+            const buzzwordInput = document.getElementById('buzzword-input');
+            buzzwordButton.addEventListener('click', handleBuzzwordBuster);
+            buzzwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleBuzzwordBuster(); });
+            
+            document.getElementById('summarize-button').addEventListener('click', handleSummaryGeneration);
+            document.addEventListener('keydown', handleKonamiCode);
+            document.getElementById('title-easter-egg').addEventListener('click', handleTitleClick);
+            
+            // Scrollytelling logic
+            const contentPanel = document.getElementById('content-panel');
+            const sections = contentPanel.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const navLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                    
+                    entry.target.classList.toggle('visible', entry.isIntersecting);
+
+                    if (entry.isIntersecting && navLink) {
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        navLink.classList.add('active');
+                    }
+                });
+            }, { root: contentPanel, rootMargin: "-50% 0px -50% 0px", threshold: 0 });
+
+            sections.forEach(section => observer.observe(section));
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            });
+        }
+
+        async function handleRebuttalGeneration(button) {
+            const contentDiv = button.closest('.accordion-content');
+            const critiqueText = contentDiv.querySelector('.critique-text').innerText;
+            const outputDiv = contentDiv.querySelector('.rebuttal-output');
+
+            button.disabled = true;
+            button.innerHTML = `<span data-translate-key="loading">${translations[currentLanguage].loading}</span><div class="loader"></div>`;
+            
+            const prompt = `As a staunch Agile proponent, provide a strong, concise counter-argument to the following critique of an Agile principle. Critique: "${critiqueText}"`;
+            const rebuttalText = await callGemini(prompt);
+
+            outputDiv.innerHTML = `<div class="card p-4 mt-4 border-l-2" style="border-color: var(--accent-color);"><h4 class="font-bold mb-2" data-translate-key="rebuttalTitle" style="color: var(--accent-color);">${translations[currentLanguage].rebuttalTitle}</h4><p>${rebuttalText.replace(/\n/g, '<br>')}</p></div>`;
+            button.disabled = false;
+            button.innerHTML = `<span data-translate-key="rebuttalBtn">${translations[currentLanguage].rebuttalBtn}</span>`;
+        }
+        
+        async function handleBuzzwordBuster() {
+            const button = document.getElementById('buzzword-button');
+            const input = document.getElementById('buzzword-input');
+            const outputDiv = document.getElementById('buzzword-output');
+            const term = input.value.trim();
+            if (!term) return;
+
+            button.disabled = true;
+            button.innerHTML = `<span data-translate-key="loading">${translations[currentLanguage].loading}</span><div class="loader"></div>`;
+            outputDiv.classList.remove('hidden');
+            outputDiv.innerHTML = '';
+
+            const prompt = `You are "The Agile Buzzword Buster." Your job is to provide a critical, no-nonsense definition of an Agile term. Explain what it's supposed to mean理想ally, and then explain how it's often misunderstood, misused, or what problems it can cause in practice. Be concise and direct. The term is: "${term}"`;
+            const definitionText = await callGemini(prompt);
+
+            outputDiv.innerHTML = definitionText.replace(/\n/g, '<br>');
+            button.disabled = false;
+            button.innerHTML = `<span data-translate-key="buzzwordBtn">${translations[currentLanguage].buzzwordBtn}</span>`;
+        }
+
+        async function handleSummaryGeneration() {
+            const button = this;
+            const outputDiv = document.getElementById('summary-output');
+            const staticText = document.getElementById('conclusion-static-text');
+
+            button.disabled = true;
+            button.innerHTML = `<span data-translate-key="loading">${translations[currentLanguage].loading}</span><div class="loader"></div>`;
+
+            const critiqueElements = document.querySelectorAll('.critique-text');
+            let allCritiques = Array.from(critiqueElements).map(el => `- ${el.innerText}`).join("\n");
+
+            const prompt = `Based on the following list of critiques against Agile methodologies, write a concise, synthesized summary of the main arguments. Critiques:\n${allCritiques}`;
+            const summaryText = await callGemini(prompt);
+
+            staticText.classList.add('hidden');
+            outputDiv.innerHTML = summaryText.replace(/\n/g, '<br>');
+            outputDiv.classList.remove('hidden');
+            button.disabled = false;
+            button.innerHTML = `<span data-translate-key="summarizeBtn">${translations[currentLanguage].summarizeBtn}</span>`;
+        }
+
+        function handleKonamiCode(e) {
+            if (e.key.toLowerCase() === konamiCodeSequence[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCodeSequence.length) {
+                    const konamiEl = document.getElementById('konami-code');
+                    konamiEl.style.opacity = '1';
+                    setTimeout(() => { konamiEl.style.opacity = '0'; }, 2000);
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        }
+
+        function handleTitleClick() {
+            titleClickCount++;
+            if (titleClickCount === 7) {
+                const egg = document.getElementById('title-easter-egg');
+                egg.style.transition = 'transform 1s ease-in-out';
+                egg.style.transform = 'rotate(360deg)';
+                setTimeout(() => { egg.style.transform = 'rotate(0deg)'; }, 1000);
+                titleClickCount = 0;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+             setupEventListeners();
+             translatePage();
+        });
+    </script>
+</body>
+</html>
